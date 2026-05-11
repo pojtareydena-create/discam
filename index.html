@@ -877,32 +877,53 @@ let pollT = null, lastCount = 0;
 //  GITHUB
 // ══════════════════════════════════════════════
 async function ghGet(path) {
-  const r = await fetch(`${GH_API}/repos/${REPO}/contents/${path}?ref=${BRANCH}&_=${Date.now()}`, {
-    headers: { Authorization: `token ${TK}`, Accept: 'application/vnd.github.v3+json', 'Cache-Control':'no-cache' }
+  // NO Cache-Control header — causes CORS preflight block
+  const r = await fetch(`${GH_API}/repos/${REPO}/contents/${path}?ref=${BRANCH}&ts=${Date.now()}`, {
+    headers: {
+      Authorization: `token ${TK}`,
+      Accept: 'application/vnd.github.v3+json'
+    }
   });
-  if (!r.ok) return null;
+  if (r.status === 404) return null; // file doesn't exist yet
+  if (!r.ok) { console.error('ghGet error', r.status, await r.text()); return null; }
   const d = await r.json();
-  const txt = decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
-  return { data: JSON.parse(txt), sha: d.sha };
+  if (!d.content) return null;
+  try {
+    const txt = decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+    return { data: JSON.parse(txt), sha: d.sha };
+  } catch(e) { console.error('ghGet parse error', e); return null; }
 }
 
 async function ghPut(path, content, sha) {
-  const enc = btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2))));
-  const body = { message:`upd ${path}`, content: enc, branch: BRANCH };
+  // Encode content properly to base64
+  const json = JSON.stringify(content, null, 2);
+  const enc = btoa(unescape(encodeURIComponent(json)));
+  const body = { message: `upd ${path}`, content: enc, branch: BRANCH };
   if (sha) body.sha = sha;
   const r = await fetch(`${GH_API}/repos/${REPO}/contents/${path}`, {
-    method:'PUT',
-    headers: { Authorization:`token ${TK}`, 'Content-Type':'application/json', Accept:'application/vnd.github.v3+json' },
+    method: 'PUT',
+    headers: {
+      Authorization: `token ${TK}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/vnd.github.v3+json'
+    },
     body: JSON.stringify(body)
   });
+  if (!r.ok) { console.error('ghPut error', r.status, await r.text()); }
   return r.ok;
 }
 
 async function loadDB() {
   const res = await ghGet('db.json');
   if (!res) {
+    // First launch: create the db file
     DB = { users:{}, groups:{}, dms:{}, friendRequests:{}, friends:{} };
-    await ghPut('db.json', DB, null);
+    const ok = await ghPut('db.json', DB, null);
+    if (ok) {
+      // Fetch SHA for subsequent saves
+      const r2 = await ghGet('db.json');
+      if (r2) DB._sha = r2.sha;
+    }
   } else {
     DB = res.data;
     DB._sha = res.sha;
@@ -911,9 +932,17 @@ async function loadDB() {
 }
 
 async function saveDB() {
-  const sha = DB._sha; delete DB._sha;
+  const sha = DB._sha;
+  delete DB._sha;
   const ok = await ghPut('db.json', DB, sha);
-  if (ok) { const r = await ghGet('db.json'); if(r) DB._sha = r.sha; }
+  if (ok) {
+    // Always re-fetch SHA after write to avoid conflicts
+    const r = await ghGet('db.json');
+    if (r) DB._sha = r.sha;
+  } else {
+    // Restore sha so next attempt can try again
+    DB._sha = sha;
+  }
   return ok;
 }
 
@@ -934,7 +963,7 @@ async function doLogin() {
   const u = v('l-user').trim().toLowerCase(), p = v('l-pass');
   if (!u||!p) return showErr('Заполните все поля');
   loading('Входим…');
-  await loadDB();
+  try { await loadDB(); } catch(e) { hideLoad(); return showErr('Ошибка подключения к GitHub API'); }
   if (!DB.users[u]) { hideLoad(); return showErr('Пользователь не найден'); }
   if (DB.users[u].password !== hp(p)) { hideLoad(); return showErr('Неверный пароль'); }
   ME = {...DB.users[u], username:u};
@@ -949,7 +978,7 @@ async function doRegister() {
   if (p.length<6) return showErr('Пароль минимум 6 символов');
   if (p!==p2) return showErr('Пароли не совпадают');
   loading('Создаём аккаунт…');
-  await loadDB();
+  try { await loadDB(); } catch(e) { hideLoad(); return showErr('Ошибка подключения к GitHub API'); }
   if (DB.users[u]) { hideLoad(); return showErr('Пользователь уже существует'); }
   DB.users[u] = { password:hp(p), displayName:u, bio:'', avatar:'', createdAt:Date.now() };
   const ok = await saveDB();
