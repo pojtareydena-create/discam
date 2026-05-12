@@ -572,14 +572,15 @@ input,textarea,button,select{font-family:var(--font);}
     <div id="list-dms" class="ch-list"></div>
 
     <div class="s-section">
-      <div class="s-section-title">
-        Заявки
-        <button class="s-section-add" onclick="openReqsPopup()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        </button>
+      <div class="s-section-title" style="cursor:pointer;user-select:none" onclick="openReqsPopup()">
+        <span style="display:flex;align-items:center;gap:6px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          Заявки в друзья
+        </span>
+        <span id="reqs-sidebar-badge" style="display:none;background:var(--danger);color:#fff;border-radius:10px;min-width:18px;height:18px;font-size:10px;font-weight:800;align-items:center;justify-content:center;padding:0 5px;animation:pulse 2s infinite"></span>
       </div>
     </div>
-    <div id="reqs-mini" style="padding:0 6px 4px;"></div>
+    <div id="reqs-mini"></div>
     <div style="flex:1"></div>
 
     <div class="user-panel">
@@ -902,27 +903,47 @@ input,textarea,button,select{font-family:var(--font);}
   </div>
 </div>
 
-<!-- MODAL: Friend Requests -->
+<!-- MODAL: Friends & Requests -->
 <div class="modal-bg" id="modal-freqs" onclick="closeMBg(event,'modal-freqs')">
-  <div class="modal" onclick="event.stopPropagation()" style="width:440px">
+  <div class="modal" onclick="event.stopPropagation()" style="width:480px;max-height:90vh;overflow-y:auto">
     <div class="modal-title">
-      <svg class="icon-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
-      Заявки в друзья
+      <svg class="icon-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Друзья и заявки
     </div>
-    <div style="margin-bottom:16px">
-      <div class="field-label" style="margin-bottom:10px">Входящие заявки</div>
-      <div id="popup-reqs-in" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto"></div>
-    </div>
-    <div style="border-top:1px solid var(--brd);padding-top:16px;margin-bottom:16px">
-      <div class="field-label" style="margin-bottom:10px">Исходящие заявки</div>
-      <div id="popup-reqs-out" style="display:flex;flex-direction:column;gap:8px;max-height:160px;overflow-y:auto"></div>
-    </div>
-    <div style="border-top:1px solid var(--brd);padding-top:16px">
-      <div class="field-label" style="margin-bottom:8px">Отправить заявку</div>
-      <div style="display:flex;gap:8px">
-        <input class="field-input" id="freqs-new" placeholder="username" style="flex:1" onkeydown="if(event.key==='Enter')sendFriendReqPopup()">
-        <button class="btn btn-primary" onclick="sendFriendReqPopup()">Отправить</button>
+
+    <!-- Tabs -->
+    <div style="display:flex;background:var(--bg2);border-radius:var(--r);padding:3px;gap:3px;margin-bottom:20px">
+      <div class="auth-tab active" id="ftab-reqs" onclick="switchFTab('reqs')" style="flex:1;padding:8px;text-align:center;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px">
+        Заявки <span id="ftab-reqs-cnt" style="display:none;background:var(--danger);color:#fff;border-radius:8px;padding:0 5px;font-size:10px;margin-left:4px"></span>
       </div>
+      <div class="auth-tab" id="ftab-friends" onclick="switchFTab('friends')" style="flex:1;padding:8px;text-align:center;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px">Мои друзья</div>
+      <div class="auth-tab" id="ftab-add" onclick="switchFTab('add')" style="flex:1;padding:8px;text-align:center;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px">Добавить</div>
+    </div>
+
+    <!-- TAB: REQS -->
+    <div id="ftab-reqs-panel" style="display:flex;flex-direction:column;gap:0">
+      <div class="field-label" style="margin-bottom:10px">Входящие заявки</div>
+      <div id="popup-reqs-in" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;margin-bottom:18px"></div>
+      <div class="field-label" style="margin-bottom:10px">Исходящие заявки</div>
+      <div id="popup-reqs-out" style="display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto"></div>
+    </div>
+
+    <!-- TAB: FRIENDS -->
+    <div id="ftab-friends-panel" style="display:none;flex-direction:column">
+      <div id="popup-friends-list" style="display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto"></div>
+    </div>
+
+    <!-- TAB: ADD -->
+    <div id="ftab-add-panel" style="display:none;flex-direction:column">
+      <div class="field-label" style="margin-bottom:8px">Найти пользователя</div>
+      <div style="display:flex;gap:8px;margin-bottom:6px">
+        <input class="field-input" id="freqs-new" placeholder="Введите логин" style="flex:1" onkeydown="if(event.key==='Enter')sendFriendReqPopup()">
+        <button class="btn btn-primary" onclick="sendFriendReqPopup()">
+          <svg class="icon-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Отправить
+        </button>
+      </div>
+      <p style="font-size:12px;color:var(--t3);font-weight:500">Введите точный логин пользователя (a-z, 0-9, _)</p>
     </div>
   </div>
 </div>
@@ -949,6 +970,8 @@ const GH_API = 'https://api.github.com';
 // ══════════════════════════════════════════════
 let ME = null, DB = {}, currentCh = null, replyTo = null, editId = null;
 let pollT = null, lastCount = 0;
+let currentFTab = 'reqs';
+let gsGroupId = null;
 
 // ══════════════════════════════════════════════
 //  GITHUB
@@ -1129,14 +1152,23 @@ function renderDMs() {
 }
 
 function renderReqsMini() {
-  const el=document.getElementById('reqs-mini');
   const n=Object.values(DB.friendRequests||{}).filter(r=>r.to===ME.username&&r.status==='pending').length;
-  if (!n) { el.innerHTML=''; return; }
-  el.innerHTML=`<div class="ch-item" onclick="openReqsPopup()">
-    <span class="ch-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg></span>
-    <span class="ch-name">Заявки</span>
-    <span class="ch-badge">${n}</span>
-  </div>`;
+  const badge=document.getElementById('reqs-badge');
+  if(badge){
+    if(n>0){badge.textContent=n;badge.style.display='flex';}
+    else{badge.style.display='none';}
+  }
+  // Also show animated bell item if pending
+  const mini=document.getElementById('reqs-mini');
+  if(!mini) return;
+  if(n>0){
+    mini.innerHTML=`<div class="ch-item" onclick="openReqsPopup()" style="animation:pulse 2s infinite">
+      <span class="ch-icon" style="color:var(--success)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg></span>
+      <span class="ch-name" style="color:var(--t1)">${n} входящ${n===1?'ая':'их'} заявк${n===1?'а':n<5?'и':''}!</span>
+    </div>`;
+  } else {
+    mini.innerHTML='';
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -1339,7 +1371,6 @@ async function createGroup() {
 }
 
 // ── Group Settings ──
-let gsGroupId = null;
 function openGroupSettings(id) {
   gsGroupId = id;
   const g = DB.groups[id];
@@ -1420,11 +1451,13 @@ async function kickMember(username) {
   if(!confirm(`Удалить ${username} из группы?`)) return;
   await loadDB();
   const g=DB.groups[gsGroupId];
+  if(!g){notify('Группа не найдена','err');return;}
   g.members=g.members.filter(m=>m!==username);
   await saveDB();
-  notify(`${username} удалён из группы`,'ok');
+  notify(`${esc(username)} удалён из группы`,'ok');
   openGroupSettings(gsGroupId);
-  renderMembers();
+  renderSidebar();
+  if(currentCh?.id===gsGroupId) renderMembers();
 }
 
 async function deleteGroup() {
@@ -1482,33 +1515,131 @@ async function sendFriendReq() {
   await saveDB(); notify('Заявка отправлена!','ok'); renderReqsMini();
 }
 
+let currentFTab = 'reqs';
+
 function openReqsPopup() {
-  renderReqsPopup();
   openModal('modal-freqs');
+  // slight delay so DOM is visible before measuring
+  setTimeout(()=>{ switchFTab('reqs'); },10);
 }
 
-function renderReqsPopup() {
-  // Incoming
+function switchFTab(tab) {
+  currentFTab = tab;
+  ['reqs','friends','add'].forEach(t=>{
+    const btn=document.getElementById(`ftab-${t}`);
+    const panel=document.getElementById(`ftab-${t}-panel`);
+    if(btn){
+      btn.style.background = t===tab ? 'var(--acc)' : 'transparent';
+      btn.style.color      = t===tab ? 'var(--bg)'  : 'var(--t2)';
+      btn.style.fontWeight = '700';
+    }
+    if(panel) panel.style.display = t===tab ? 'flex' : 'none';
+  });
+  renderFTab();
+}
+
+function renderFTab() {
+  if(currentFTab==='reqs') renderReqsTab();
+  else if(currentFTab==='friends') renderFriendsTab();
+  // update incoming badge on tab button
+  const inc=Object.values(DB.friendRequests||{}).filter(r=>r.to===ME.username&&r.status==='pending').length;
+  const badge=document.getElementById('ftab-reqs-cnt');
+  if(badge){if(inc>0){badge.textContent=inc;badge.style.display='inline-block';}else badge.style.display='none';}
+  const sbar=document.getElementById('reqs-sidebar-badge');
+  if(sbar){if(inc>0){sbar.textContent=inc;sbar.style.display='flex';}else sbar.style.display='none';}
+}
+
+function renderReqsTab() {
+  // incoming
   const inc=Object.entries(DB.friendRequests||{}).filter(([,r])=>r.to===ME.username&&r.status==='pending');
+  const badge=document.getElementById('ftab-reqs-cnt');
+  if(badge){if(inc.length){badge.textContent=inc.length;badge.style.display='inline';}else badge.style.display='none';}
   const el=document.getElementById('popup-reqs-in');
-  el.innerHTML=inc.length?inc.map(([id,r])=>{
+  if(!el) return;
+  el.innerHTML=inc.length ? inc.map(([id,r])=>{
     const u=DB.users[r.from]||{};
-    return `<div class="friend-item" style="padding:8px 0"><div id="pr-in-${id}"></div><div style="flex:1;margin-left:10px"><div class="friend-name">${esc(u.displayName||r.from)}</div><div class="friend-sub">@${esc(r.from)}</div></div><button class="btn btn-primary btn-xs" onclick="acceptReq('${id}');renderReqsPopup()">Принять</button>&nbsp;<button class="btn btn-danger btn-xs" onclick="rejectReq('${id}');renderReqsPopup()">Отклонить</button></div>`;
-  }).join(''):'<p style="color:var(--t3);font-size:13px;font-weight:600">Нет входящих заявок</p>';
-  inc.forEach(([id,r])=>{const u=DB.users[r.from]||{};setTimeout(()=>renderAv(`pr-in-${id}`,u.avatar,u.displayName||r.from,34),0);});
-  // Outgoing
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border-radius:var(--r);border:1.5px solid var(--brd)">
+      <div id="pr-in-${id}"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;font-size:14px">${esc(u.displayName||r.from)}</div>
+        <div style="font-size:12px;color:var(--t3);font-weight:500">@${esc(r.from)}</div>
+      </div>
+      <button class="btn btn-primary btn-xs" onclick="acceptReqAndRefresh('${id}')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Принять
+      </button>
+      <button class="btn btn-danger btn-xs" onclick="rejectReqAndRefresh('${id}')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Откл.
+      </button>
+    </div>`;
+  }).join('') : '<div style="padding:16px;text-align:center;color:var(--t3);font-weight:600;font-size:13px">Нет входящих заявок</div>';
+  inc.forEach(([id,r])=>{const u=DB.users[r.from]||{};setTimeout(()=>renderAv(`pr-in-${id}`,u.avatar,u.displayName||r.from,38),0);});
+
+  // outgoing
   const out=Object.entries(DB.friendRequests||{}).filter(([,r])=>r.from===ME.username&&r.status==='pending');
   const el2=document.getElementById('popup-reqs-out');
-  el2.innerHTML=out.length?out.map(([id,r])=>{
+  if(!el2) return;
+  el2.innerHTML=out.length ? out.map(([id,r])=>{
     const u=DB.users[r.to]||{};
-    return `<div class="friend-item" style="padding:8px 0"><div id="pr-out-${id}"></div><div style="flex:1;margin-left:10px"><div class="friend-name">${esc(u.displayName||r.to)}</div><div class="friend-sub">@${esc(r.to)}</div></div><span style="font-size:11px;color:var(--t3);font-weight:700">Ожидание…</span><button class="btn btn-danger btn-xs" style="margin-left:8px" onclick="cancelFriendReq('${id}')">Отозвать</button></div>`;
-  }).join(''):'<p style="color:var(--t3);font-size:13px;font-weight:600">Нет исходящих заявок</p>';
-  out.forEach(([id,r])=>{const u=DB.users[r.to]||{};setTimeout(()=>renderAv(`pr-out-${id}`,u.avatar,u.displayName||r.to,34),0);});
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border-radius:var(--r);border:1.5px solid var(--brd)">
+      <div id="pr-out-${id}"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;font-size:14px">${esc(u.displayName||r.to)}</div>
+        <div style="font-size:12px;color:var(--t3);font-weight:500">@${esc(r.to)}</div>
+      </div>
+      <span style="font-size:11px;color:var(--t3);font-weight:700;white-space:nowrap">Ожидание…</span>
+      <button class="btn btn-danger btn-xs" onclick="cancelFriendReq('${id}')">Отозвать</button>
+    </div>`;
+  }).join('') : '<div style="padding:16px;text-align:center;color:var(--t3);font-weight:600;font-size:13px">Нет исходящих заявок</div>';
+  out.forEach(([id,r])=>{const u=DB.users[r.to]||{};setTimeout(()=>renderAv(`pr-out-${id}`,u.avatar,u.displayName||r.to,38),0);});
+}
+
+function renderFriendsTab() {
+  const frs=DB.friends?.[ME.username]||[];
+  const el=document.getElementById('popup-friends-list');
+  if(!el) return;
+  el.innerHTML=frs.length ? frs.map(f=>{
+    const u=DB.users[f]||{};
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border-radius:var(--r);border:1.5px solid var(--brd)">
+      <div id="pfr-${f}"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;font-size:14px">${esc(u.displayName||f)}</div>
+        <div style="font-size:12px;color:var(--t3);font-weight:500">@${esc(f)}</div>
+      </div>
+      <button class="btn btn-ghost btn-xs" onclick="closeModal('modal-freqs');dmWith('${esc(f)}')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Написать
+      </button>
+      <button class="btn btn-danger btn-xs" onclick="removeFriend('${esc(f)}')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Удалить
+      </button>
+    </div>`;
+  }).join('') : '<div style="padding:24px;text-align:center;color:var(--t3);font-weight:600;font-size:13px">У вас пока нет друзей.<br>Отправьте заявку на вкладке «Добавить»</div>';
+  frs.forEach(f=>{const u=DB.users[f]||{};setTimeout(()=>renderAv(`pfr-${f}`,u.avatar,u.displayName||f,38),0);});
+}
+
+async function acceptReqAndRefresh(id) {
+  await acceptReq(id);
+  renderFTab(); renderReqsMini();
+}
+
+async function rejectReqAndRefresh(id) {
+  await rejectReq(id);
+  renderFTab(); renderReqsMini();
+}
+
+async function removeFriend(target) {
+  if(!confirm(`Удалить ${target} из друзей?`)) return;
+  await loadDB();
+  if(DB.friends[ME.username]) DB.friends[ME.username]=DB.friends[ME.username].filter(f=>f!==target);
+  if(DB.friends[target]) DB.friends[target]=DB.friends[target].filter(f=>f!==ME.username);
+  await saveDB();
+  notify('Друг удалён','ok');
+  renderFriendsTab(); renderSidebar();
 }
 
 async function sendFriendReqPopup() {
-  const target=document.getElementById('freqs-new').value.trim().toLowerCase();
-  if(!target||target===ME.username) return;
+  const inp=document.getElementById('freqs-new');
+  const target=inp.value.trim().toLowerCase();
+  if(!target||target===ME.username){notify('Введите корректный логин','err');return;}
   await loadDB();
   if(!DB.users[target]){notify('Пользователь не найден','err');return;}
   if((DB.friends?.[ME.username]||[]).includes(target)){notify('Уже в друзьях!','ok');return;}
@@ -1516,9 +1647,9 @@ async function sendFriendReqPopup() {
   if(already){notify('Заявка уже отправлена','err');return;}
   DB.friendRequests[uid()]={from:ME.username,to:target,status:'pending',ts:Date.now()};
   await saveDB();
-  document.getElementById('freqs-new').value='';
+  inp.value='';
   notify('Заявка отправлена!','ok');
-  renderReqsPopup(); renderReqsMini();
+  switchFTab('reqs'); renderReqsMini();
 }
 
 async function cancelFriendReq(id) {
@@ -1526,7 +1657,7 @@ async function cancelFriendReq(id) {
   delete DB.friendRequests[id];
   await saveDB();
   notify('Заявка отозвана','ok');
-  renderReqsPopup(); renderReqsMini();
+  renderFTab(); renderReqsMini();
 }
 
 async function acceptReq(id) {
@@ -1539,7 +1670,9 @@ async function acceptReq(id) {
   if(!DB.friends[req.from].includes(ME.username)) DB.friends[req.from].push(ME.username);
   const dmId=[ME.username,req.from].sort().join('__');
   if(!DB.dms[dmId]) DB.dms[dmId]={members:[ME.username,req.from],messages:[]};
-  await saveDB(); renderFriendsSec(); renderReqsMini(); renderSidebar(); notify('Заявка принята!','ok');
+  await saveDB();
+  renderFriendsSec(); renderReqsMini(); renderSidebar();
+  notify(`Вы теперь друзья с ${req.from}!`,'ok');
 }
 
 async function rejectReq(id) {
@@ -1551,19 +1684,22 @@ async function rejectReq(id) {
 function renderFriendsSec() {
   const reqs=Object.entries(DB.friendRequests||{}).filter(([,r])=>r.to===ME.username&&r.status==='pending');
   const el=document.getElementById('s-reqs');
-  el.innerHTML=reqs.length?reqs.map(([id,r])=>{
-    const u=DB.users[r.from]||{};
-    return `<div class="friend-item"><div id="freqav-${id}"></div><div style="flex:1"><div class="friend-name">${esc(u.displayName||r.from)}</div><div class="friend-sub">@${esc(r.from)}</div></div><button class="btn btn-primary btn-xs" onclick="acceptReq('${id}')">Принять</button><button class="btn btn-danger btn-xs" onclick="rejectReq('${id}')">Отклонить</button></div>`;
-  }).join('') : '<p style="color:var(--t3);font-weight:600">Нет входящих заявок</p>';
-  reqs.forEach(([id,r])=>{ const u=DB.users[r.from]||{}; setTimeout(()=>renderAv(`freqav-${id}`,u.avatar,u.displayName||r.from,36),0); });
-
+  if(el) {
+    el.innerHTML=reqs.length?reqs.map(([id,r])=>{
+      const u=DB.users[r.from]||{};
+      return `<div class="friend-item"><div id="freqav-${id}"></div><div style="flex:1;margin-left:10px"><div class="friend-name">${esc(u.displayName||r.from)}</div><div class="friend-sub">@${esc(r.from)}</div></div><button class="btn btn-primary btn-xs" onclick="acceptReq('${id}');renderFriendsSec()">Принять</button>&nbsp;<button class="btn btn-danger btn-xs" onclick="rejectReq('${id}');renderFriendsSec()">Откл.</button></div>`;
+    }).join('') : '<p style="color:var(--t3);font-weight:600">Нет входящих заявок</p>';
+    reqs.forEach(([id,r])=>{const u=DB.users[r.from]||{};setTimeout(()=>renderAv(`freqav-${id}`,u.avatar,u.displayName||r.from,36),0);});
+  }
   const frs=DB.friends?.[ME.username]||[];
   const fl=document.getElementById('s-friends');
-  fl.innerHTML=frs.length?frs.map(f=>{
-    const u=DB.users[f]||{};
-    return `<div class="friend-item"><div id="frav-${f}"></div><div style="flex:1"><div class="friend-name">${esc(u.displayName||f)}</div><div class="friend-sub">@${esc(f)}</div></div><button class="btn btn-ghost btn-xs" onclick="dmWith('${esc(f)}')">Написать</button></div>`;
-  }).join('') : '<p style="color:var(--t3);font-weight:600">Список пуст</p>';
-  frs.forEach(f=>{ const u=DB.users[f]||{}; setTimeout(()=>renderAv(`frav-${f}`,u.avatar,u.displayName||f,36),0); });
+  if(fl) {
+    fl.innerHTML=frs.length?frs.map(f=>{
+      const u=DB.users[f]||{};
+      return `<div class="friend-item"><div id="frav-${f}"></div><div style="flex:1;margin-left:10px"><div class="friend-name">${esc(u.displayName||f)}</div><div class="friend-sub">@${esc(f)}</div></div><button class="btn btn-ghost btn-xs" onclick="dmWith('${esc(f)}')">Написать</button>&nbsp;<button class="btn btn-danger btn-xs" onclick="removeFriend('${esc(f)}')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`;
+    }).join('') : '<p style="color:var(--t3);font-weight:600">Список пуст</p>';
+    frs.forEach(f=>{const u=DB.users[f]||{};setTimeout(()=>renderAv(`frav-${f}`,u.avatar,u.displayName||f,36),0);});
+  }
 }
 
 // ══════════════════════════════════════════════
