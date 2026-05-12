@@ -387,7 +387,7 @@ input,textarea,button,select{font-family:var(--font);}
 .modal-actions{display:flex;gap:10px;margin-top:8px;justify-content:flex-end;}
 
 /* ─── FRIENDS ─── */
-.friend-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--brd);}
+.friend-item{display:flex;align-items:center;gap:0;padding:12px 0;border-bottom:1px solid var(--brd);}
 .friend-item:last-child{border-bottom:none;}
 .friend-name{font-weight:800;font-size:14px;}
 .friend-sub{font-size:12px;color:var(--t3);font-weight:500;margin-top:1px;}
@@ -574,7 +574,7 @@ input,textarea,button,select{font-family:var(--font);}
     <div class="s-section">
       <div class="s-section-title">
         Заявки
-        <button class="s-section-add" onclick="openModal('modal-friend')">
+        <button class="s-section-add" onclick="openReqsPopup()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </button>
       </div>
@@ -850,6 +850,83 @@ input,textarea,button,select{font-family:var(--font);}
   </div>
 </div>
 
+<!-- MODAL: Group Settings -->
+<div class="modal-bg" id="modal-gsettings" onclick="closeMBg(event,'modal-gsettings')">
+  <div class="modal" onclick="event.stopPropagation()" style="width:480px">
+    <div class="modal-title">
+      <svg class="icon-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Настройки группы
+    </div>
+    <!-- Avatar -->
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:16px;background:var(--bg2);border-radius:var(--r);border:1.5px solid var(--brd)">
+      <div id="gs-av-wrap" style="cursor:pointer;position:relative" onclick="document.getElementById('gs-av-inp').click()">
+        <div id="gs-av"></div>
+        <div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s" id="gs-av-ov">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+      </div>
+      <div style="flex:1">
+        <div class="field-label" style="margin-bottom:6px">Аватар группы</div>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('gs-av-inp').click()">Загрузить фото</button>
+        <button class="btn btn-ghost btn-sm" style="margin-left:6px;color:var(--danger)" onclick="removeGroupAvatar()">Удалить</button>
+      </div>
+    </div>
+    <input type="file" id="gs-av-inp" accept="image/*" style="display:none" onchange="handleGroupAvatar(this)">
+    <!-- Name & desc -->
+    <div class="modal-form" style="margin-bottom:20px">
+      <div class="field-wrap"><div class="field-label">Название группы</div><input class="field-input" id="gs-name" placeholder="Название"></div>
+      <div class="field-wrap"><div class="field-label">Описание</div><input class="field-input" id="gs-desc" placeholder="О чём этот чат?"></div>
+      <button class="btn btn-primary" style="align-self:flex-start" onclick="saveGroupSettings()">
+        <svg class="icon-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Сохранить
+      </button>
+    </div>
+    <!-- Add member -->
+    <div style="border-top:1px solid var(--brd);padding-top:18px;margin-bottom:18px">
+      <div class="field-label" style="margin-bottom:10px">Добавить участника</div>
+      <div id="gs-friends-list" style="display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto"></div>
+    </div>
+    <!-- Members list -->
+    <div style="border-top:1px solid var(--brd);padding-top:18px;margin-bottom:18px">
+      <div class="field-label" style="margin-bottom:10px">Участники</div>
+      <div id="gs-members-list" style="display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto"></div>
+    </div>
+    <!-- Danger zone -->
+    <div style="border-top:1px solid rgba(255,68,68,.2);padding-top:18px">
+      <div class="field-label" style="color:var(--danger);margin-bottom:10px">Опасная зона</div>
+      <button class="btn btn-danger" onclick="deleteGroup()">
+        <svg class="icon-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m5 0V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2"/></svg>
+        Удалить группу
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Friend Requests -->
+<div class="modal-bg" id="modal-freqs" onclick="closeMBg(event,'modal-freqs')">
+  <div class="modal" onclick="event.stopPropagation()" style="width:440px">
+    <div class="modal-title">
+      <svg class="icon-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
+      Заявки в друзья
+    </div>
+    <div style="margin-bottom:16px">
+      <div class="field-label" style="margin-bottom:10px">Входящие заявки</div>
+      <div id="popup-reqs-in" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto"></div>
+    </div>
+    <div style="border-top:1px solid var(--brd);padding-top:16px;margin-bottom:16px">
+      <div class="field-label" style="margin-bottom:10px">Исходящие заявки</div>
+      <div id="popup-reqs-out" style="display:flex;flex-direction:column;gap:8px;max-height:160px;overflow-y:auto"></div>
+    </div>
+    <div style="border-top:1px solid var(--brd);padding-top:16px">
+      <div class="field-label" style="margin-bottom:8px">Отправить заявку</div>
+      <div style="display:flex;gap:8px">
+        <input class="field-input" id="freqs-new" placeholder="username" style="flex:1" onkeydown="if(event.key==='Enter')sendFriendReqPopup()">
+        <button class="btn btn-primary" onclick="sendFriendReqPopup()">Отправить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- LIGHTBOX -->
 <div id="lightbox" onclick="document.getElementById('lightbox').style.display='none'">
   <img id="lb-img">
@@ -1025,7 +1102,13 @@ function renderGroups() {
   if (!gs.length) { el.innerHTML='<div style="padding:4px 16px;font-size:12px;color:var(--t3);font-weight:600">Нет групп</div>'; return; }
   gs.forEach(([id,g])=>{
     const d=document.createElement('div'); d.className='ch-item'+(currentCh?.id===id?' active':'');
-    d.innerHTML=`<span class="ch-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg></span><span class="ch-name">${esc(g.name)}</span>`;
+    const isOwner=g.owner===ME.username;
+    const avHtml=g.avatar
+      ? `<img src="${g.avatar}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0">`
+      : `<span class="ch-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg></span>`;
+    d.innerHTML=`${avHtml}<span class="ch-name">${esc(g.name)}</span>${isOwner?`<button class="s-section-add" style="flex-shrink:0;opacity:0;transition:opacity .15s" onclick="event.stopPropagation();openGroupSettings('${id}')" title="Настройки группы"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>`:''}`;
+    d.onmouseenter=()=>{const b=d.querySelector('.s-section-add');if(b)b.style.opacity='1';};
+    d.onmouseleave=()=>{const b=d.querySelector('.s-section-add');if(b)b.style.opacity='0';};
     d.onclick=()=>openCh('group',id); el.appendChild(d);
   });
 }
@@ -1049,7 +1132,7 @@ function renderReqsMini() {
   const el=document.getElementById('reqs-mini');
   const n=Object.values(DB.friendRequests||{}).filter(r=>r.to===ME.username&&r.status==='pending').length;
   if (!n) { el.innerHTML=''; return; }
-  el.innerHTML=`<div class="ch-item" onclick="openSettings();showSec('friends')">
+  el.innerHTML=`<div class="ch-item" onclick="openReqsPopup()">
     <span class="ch-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg></span>
     <span class="ch-name">Заявки</span>
     <span class="ch-badge">${n}</span>
@@ -1247,10 +1330,119 @@ async function createGroup() {
   const name=v('g-name').trim(), desc=v('g-desc').trim();
   if (!name) return;
   closeModal('modal-group');
+  document.getElementById('g-name').value='';
+  document.getElementById('g-desc').value='';
   await loadDB();
   const id=uid();
-  DB.groups[id]={name,description:desc,members:[ME.username],messages:[],createdAt:Date.now(),owner:ME.username};
+  DB.groups[id]={name,description:desc,members:[ME.username],messages:[],createdAt:Date.now(),owner:ME.username,avatar:''};
   await saveDB(); renderSidebar(); openCh('group',id); notify('Группа создана!','ok');
+}
+
+// ── Group Settings ──
+let gsGroupId = null;
+function openGroupSettings(id) {
+  gsGroupId = id;
+  const g = DB.groups[id];
+  if (!g) return;
+  document.getElementById('gs-name').value = g.name||'';
+  document.getElementById('gs-desc').value = g.description||'';
+  renderAv('gs-av', g.avatar, g.name, 56);
+  const ov = document.getElementById('gs-av-ov');
+  const avW = document.getElementById('gs-av-wrap');
+  avW.onmouseenter=()=>{ov.style.opacity='1';}; avW.onmouseleave=()=>{ov.style.opacity='0';};
+  // Friends to add
+  const myFriends = (DB.friends?.[ME.username]||[]).filter(f=>!g.members.includes(f));
+  const fl = document.getElementById('gs-friends-list');
+  fl.innerHTML = myFriends.length ? myFriends.map(f=>{
+    const u=DB.users[f]||{};
+    return `<div class="friend-item" style="padding:8px 0"><div id="gsfr-${f}"></div><div style="flex:1;margin-left:10px"><div class="friend-name">${esc(u.displayName||f)}</div><div class="friend-sub">@${esc(f)}</div></div><button class="btn btn-primary btn-xs" onclick="addMemberToGroup('${esc(f)}')"><svg class="icon-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Добавить</button></div>`;
+  }).join('') : '<p style="color:var(--t3);font-size:13px;font-weight:600">Все друзья уже в группе</p>';
+  myFriends.forEach(f=>{const u=DB.users[f]||{};setTimeout(()=>renderAv(`gsfr-${f}`,u.avatar,u.displayName||f,34),0);});
+  // Current members
+  const ml = document.getElementById('gs-members-list');
+  ml.innerHTML = g.members.map(m=>{
+    const u=DB.users[m]||{};
+    const isOwner=m===g.owner;
+    const isMe=m===ME.username;
+    return `<div class="friend-item" style="padding:8px 0"><div id="gsmem-${m}"></div><div style="flex:1;margin-left:10px"><div class="friend-name">${esc(u.displayName||m)}${isOwner?' <span style="font-size:10px;color:var(--t3);background:var(--bg3);padding:1px 6px;border-radius:6px;font-weight:700">владелец</span>':''}</div><div class="friend-sub">@${esc(m)}</div></div>${!isOwner&&!isMe?`<button class="btn btn-danger btn-xs" onclick="kickMember('${esc(m)}')"><svg class="icon-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`:'&nbsp;'}</div>`;
+  }).join('');
+  g.members.forEach(m=>{const u=DB.users[m]||{};setTimeout(()=>renderAv(`gsmem-${m}`,u.avatar,u.displayName||m,34),0);});
+  openModal('modal-gsettings');
+}
+
+async function saveGroupSettings() {
+  const name=document.getElementById('gs-name').value.trim();
+  const desc=document.getElementById('gs-desc').value.trim();
+  if (!name) return;
+  await loadDB();
+  DB.groups[gsGroupId].name=name;
+  DB.groups[gsGroupId].description=desc;
+  await saveDB();
+  renderSidebar();
+  if(currentCh?.id===gsGroupId) openCh('group',gsGroupId);
+  notify('Настройки сохранены!','ok');
+}
+
+async function handleGroupAvatar(inp) {
+  if(!inp.files[0]) return;
+  const f=inp.files[0];
+  if(f.size>500*1024){notify('Фото не более 500KB','err');return;}
+  const data=await readB64(f);
+  await loadDB();
+  DB.groups[gsGroupId].avatar=data;
+  await saveDB();
+  renderAv('gs-av',data,DB.groups[gsGroupId].name,56);
+  renderSidebar();
+  notify('Аватар группы обновлён!','ok');
+  inp.value='';
+}
+
+async function removeGroupAvatar() {
+  await loadDB();
+  DB.groups[gsGroupId].avatar='';
+  await saveDB();
+  renderAv('gs-av','',DB.groups[gsGroupId].name,56);
+  renderSidebar();
+  notify('Аватар удалён','ok');
+}
+
+async function addMemberToGroup(username) {
+  await loadDB();
+  const g=DB.groups[gsGroupId];
+  if(!g.members.includes(username)) g.members.push(username);
+  await saveDB();
+  notify(`${username} добавлен в группу!`,'ok');
+  openGroupSettings(gsGroupId); // refresh modal
+  renderMembers();
+}
+
+async function kickMember(username) {
+  if(!confirm(`Удалить ${username} из группы?`)) return;
+  await loadDB();
+  const g=DB.groups[gsGroupId];
+  g.members=g.members.filter(m=>m!==username);
+  await saveDB();
+  notify(`${username} удалён из группы`,'ok');
+  openGroupSettings(gsGroupId);
+  renderMembers();
+}
+
+async function deleteGroup() {
+  const g=DB.groups[gsGroupId];
+  if(!confirm(`Удалить группу "${g?.name}"? Это действие необратимо!`)) return;
+  closeModal('modal-gsettings');
+  await loadDB();
+  delete DB.groups[gsGroupId];
+  await saveDB();
+  if(currentCh?.id===gsGroupId) {
+    currentCh=null;
+    document.getElementById('input-area').style.display='none';
+    document.getElementById('members-btn').style.display='none';
+    document.getElementById('header-inner').innerHTML=`<span style="color:var(--t3);font-weight:600">Выберите чат</span>`;
+    document.getElementById('msgs-wrap').innerHTML=`<div class="empty" style="height:100%"><div class="empty-icon"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><p>Выберите группу или беседу слева</p></div>`;
+  }
+  renderSidebar();
+  notify('Группа удалена','ok');
 }
 
 async function startDM() {
@@ -1281,8 +1473,60 @@ async function sendFriendReq() {
   closeModal('modal-friend');
   await loadDB();
   if (!DB.users[target]) { notify('Пользователь не найден','err'); return; }
+  // Check already friends
+  if((DB.friends?.[ME.username]||[]).includes(target)){notify('Уже в друзьях!','ok');return;}
+  // Check pending
+  const already=Object.values(DB.friendRequests||{}).some(r=>r.from===ME.username&&r.to===target&&r.status==='pending');
+  if(already){notify('Заявка уже отправлена','err');return;}
   DB.friendRequests[uid()]={from:ME.username,to:target,status:'pending',ts:Date.now()};
   await saveDB(); notify('Заявка отправлена!','ok'); renderReqsMini();
+}
+
+function openReqsPopup() {
+  renderReqsPopup();
+  openModal('modal-freqs');
+}
+
+function renderReqsPopup() {
+  // Incoming
+  const inc=Object.entries(DB.friendRequests||{}).filter(([,r])=>r.to===ME.username&&r.status==='pending');
+  const el=document.getElementById('popup-reqs-in');
+  el.innerHTML=inc.length?inc.map(([id,r])=>{
+    const u=DB.users[r.from]||{};
+    return `<div class="friend-item" style="padding:8px 0"><div id="pr-in-${id}"></div><div style="flex:1;margin-left:10px"><div class="friend-name">${esc(u.displayName||r.from)}</div><div class="friend-sub">@${esc(r.from)}</div></div><button class="btn btn-primary btn-xs" onclick="acceptReq('${id}');renderReqsPopup()">Принять</button>&nbsp;<button class="btn btn-danger btn-xs" onclick="rejectReq('${id}');renderReqsPopup()">Отклонить</button></div>`;
+  }).join(''):'<p style="color:var(--t3);font-size:13px;font-weight:600">Нет входящих заявок</p>';
+  inc.forEach(([id,r])=>{const u=DB.users[r.from]||{};setTimeout(()=>renderAv(`pr-in-${id}`,u.avatar,u.displayName||r.from,34),0);});
+  // Outgoing
+  const out=Object.entries(DB.friendRequests||{}).filter(([,r])=>r.from===ME.username&&r.status==='pending');
+  const el2=document.getElementById('popup-reqs-out');
+  el2.innerHTML=out.length?out.map(([id,r])=>{
+    const u=DB.users[r.to]||{};
+    return `<div class="friend-item" style="padding:8px 0"><div id="pr-out-${id}"></div><div style="flex:1;margin-left:10px"><div class="friend-name">${esc(u.displayName||r.to)}</div><div class="friend-sub">@${esc(r.to)}</div></div><span style="font-size:11px;color:var(--t3);font-weight:700">Ожидание…</span><button class="btn btn-danger btn-xs" style="margin-left:8px" onclick="cancelFriendReq('${id}')">Отозвать</button></div>`;
+  }).join(''):'<p style="color:var(--t3);font-size:13px;font-weight:600">Нет исходящих заявок</p>';
+  out.forEach(([id,r])=>{const u=DB.users[r.to]||{};setTimeout(()=>renderAv(`pr-out-${id}`,u.avatar,u.displayName||r.to,34),0);});
+}
+
+async function sendFriendReqPopup() {
+  const target=document.getElementById('freqs-new').value.trim().toLowerCase();
+  if(!target||target===ME.username) return;
+  await loadDB();
+  if(!DB.users[target]){notify('Пользователь не найден','err');return;}
+  if((DB.friends?.[ME.username]||[]).includes(target)){notify('Уже в друзьях!','ok');return;}
+  const already=Object.values(DB.friendRequests||{}).some(r=>r.from===ME.username&&r.to===target&&r.status==='pending');
+  if(already){notify('Заявка уже отправлена','err');return;}
+  DB.friendRequests[uid()]={from:ME.username,to:target,status:'pending',ts:Date.now()};
+  await saveDB();
+  document.getElementById('freqs-new').value='';
+  notify('Заявка отправлена!','ok');
+  renderReqsPopup(); renderReqsMini();
+}
+
+async function cancelFriendReq(id) {
+  await loadDB();
+  delete DB.friendRequests[id];
+  await saveDB();
+  notify('Заявка отозвана','ok');
+  renderReqsPopup(); renderReqsMini();
 }
 
 async function acceptReq(id) {
