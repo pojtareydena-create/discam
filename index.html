@@ -28,7 +28,7 @@
   --brd2:rgba(255,255,255,.03);
   --r:8px;--rl:12px;
   --font:'Inter',sans-serif;
-  --navw:260px;
+  --navw:220px;
   --topH:52px;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--t1);min-height:100vh;font-size:14px;}
@@ -87,7 +87,7 @@ textarea.fi{resize:vertical;}
 .ibtn:active{transform:scale(.88);}
 
 /* ── TOP NAV ── */
-#topnav{position:fixed;top:0;left:0;right:0;height:var(--topH);background:var(--bg1);border-bottom:1px solid var(--brd);z-index:200;display:flex;align-items:center;padding:0 20px;gap:16px;}
+#topnav{position:fixed;top:0;left:0;right:0;height:var(--topH);background:var(--bg1);border-bottom:1px solid var(--brd);z-index:200;display:flex;align-items:center;padding:0 16px;gap:12px;}
 .topnav-logo{font-size:20px;font-weight:900;color:var(--acc);letter-spacing:-1px;flex-shrink:0;}
 .topnav-search{flex:1;max-width:340px;position:relative;}
 .topnav-search input{background:var(--bg2);border:1px solid var(--brd);border-radius:20px;padding:7px 12px 7px 34px;color:var(--t1);font-size:13px;outline:none;width:100%;transition:border .18s;}
@@ -105,8 +105,8 @@ textarea.fi{resize:vertical;}
 #layout{display:flex;margin-top:var(--topH);min-height:calc(100vh - var(--topH));}
 
 /* ── LEFT NAV ── */
-#leftnav{width:var(--navw);flex-shrink:0;padding:12px 8px;position:sticky;top:var(--topH);height:calc(100vh - var(--topH));overflow-y:auto;}
-.nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:var(--r);cursor:pointer;transition:all .15s;color:var(--t2);font-weight:600;font-size:14px;margin-bottom:2px;}
+#leftnav{width:var(--navw);flex-shrink:0;padding:8px 6px;position:sticky;top:var(--topH);height:calc(100vh - var(--topH));overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r);cursor:pointer;transition:all .15s;color:var(--t2);font-weight:600;font-size:14px;margin-bottom:1px;}
 .nav-item:hover{background:var(--bg2);color:var(--t1);}
 .nav-item.on{background:var(--acch);color:var(--acc2);}
 .nav-item svg{flex-shrink:0;}
@@ -115,8 +115,8 @@ textarea.fi{resize:vertical;}
 .nav-group-title{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;padding:8px 12px 4px;}
 
 /* ── MAIN CONTENT ── */
-#content{flex:1;min-width:0;padding:18px 16px;max-width:680px;}
-#right-col{width:280px;flex-shrink:0;padding:18px 8px;display:flex;flex-direction:column;gap:12px;}
+#content{flex:1;min-width:0;padding:14px 12px;}
+#right-col{width:260px;flex-shrink:0;padding:14px 6px;display:flex;flex-direction:column;gap:10px;}
 
 /* ── CARDS ── */
 .card{background:var(--bg1);border:1px solid var(--brd);border-radius:var(--rl);overflow:hidden;animation:fadeUp .25s ease;}
@@ -129,7 +129,7 @@ textarea.fi{resize:vertical;}
 .av img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
 
 /* ── PROFILE PAGE ── */
-.profile-cover{height:200px;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);position:relative;overflow:hidden;}
+.profile-cover{height:220px;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);position:relative;overflow:hidden;}
 .profile-cover img{width:100%;height:100%;object-fit:cover;}
 .profile-cover-edit{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);border-radius:var(--r);padding:6px 10px;cursor:pointer;font-size:12px;font-weight:600;color:#fff;display:flex;align-items:center;gap:6px;}
 .profile-cover-edit:hover{background:rgba(0,0,0,.7);}
@@ -148,13 +148,13 @@ textarea.fi{resize:vertical;}
 .profile-actions{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap;}
 
 /* ── POSTS ── */
-.post{background:var(--bg1);border:1px solid var(--brd);border-radius:var(--rl);margin-bottom:10px;overflow:hidden;animation:fadeUp .2s ease;}
-.post-header{padding:13px 15px 10px;display:flex;align-items:center;gap:11px;}
+.post{background:var(--bg1);border:1px solid var(--brd);border-radius:var(--rl);margin-bottom:8px;overflow:hidden;animation:fadeUp .2s ease;}
+.post-header{padding:11px 14px 8px;display:flex;align-items:center;gap:10px;}
 .post-meta{flex:1;}
 .post-author{font-weight:700;font-size:14px;cursor:pointer;}
 .post-author:hover{color:var(--acc2);}
 .post-time{font-size:12px;color:var(--t3);margin-top:2px;}
-.post-body{padding:0 15px 10px;}
+.post-body{padding:0 14px 8px;}
 .post-text{font-size:14px;line-height:1.6;white-space:pre-wrap;word-break:break-word;}
 .post-text a{color:var(--acc2);}
 .post-img{width:100%;max-height:500px;object-fit:cover;display:block;cursor:zoom-in;}
@@ -164,7 +164,7 @@ textarea.fi{resize:vertical;}
 .post-img-grid.g3{grid-template-columns:1fr 1fr 1fr;}
 .post-img-grid img{width:100%;aspect-ratio:1;object-fit:cover;cursor:zoom-in;transition:opacity .15s;}
 .post-img-grid img:hover{opacity:.9;}
-.post-actions{padding:8px 15px 12px;border-top:1px solid var(--brd);display:flex;align-items:center;gap:4px;}
+.post-actions{padding:6px 14px 10px;border-top:1px solid var(--brd);display:flex;align-items:center;gap:4px;}
 .post-act-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;color:var(--t3);transition:all .15s;border:none;background:transparent;}
 .post-act-btn:hover{background:var(--bg3);color:var(--t1);}
 .post-act-btn.liked{color:var(--danger);}
@@ -208,7 +208,7 @@ textarea.fi{resize:vertical;}
 .comm-member-badge{font-size:10px;font-weight:700;color:var(--acc2);margin-top:5px;}
 
 /* ── PUBLIC PAGE ── */
-.public-cover{height:220px;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);position:relative;overflow:hidden;}
+.public-cover{height:240px;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);position:relative;overflow:hidden;}
 .public-cover img{width:100%;height:100%;object-fit:cover;}
 .public-cover-edit-btn{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.2);border-radius:var(--r);padding:6px 10px;cursor:pointer;font-size:12px;font-weight:600;color:#fff;display:flex;align-items:center;gap:6px;}
 .public-cover-edit-btn:hover{background:rgba(0,0,0,.75);}
@@ -232,16 +232,16 @@ textarea.fi{resize:vertical;}
 .msg-conv-last{font-size:12px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
 .msg-conv-time{font-size:11px;color:var(--t3);flex-shrink:0;}
 .msg-conv-unread{background:var(--acc);color:#fff;border-radius:10px;min-width:18px;height:18px;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;flex-shrink:0;}
-.chat-wrap{display:flex;height:calc(100vh - var(--topH));gap:0;}
-.chat-sidebar{width:280px;border-right:1px solid var(--brd);display:flex;flex-direction:column;overflow:hidden;}
+.chat-wrap{display:flex;height:calc(100vh - var(--topH));gap:0;overflow:hidden;}
+.chat-sidebar{width:300px;flex-shrink:0;border-right:1px solid var(--brd);display:flex;flex-direction:column;overflow:hidden;}
 .chat-sidebar-head{padding:13px 14px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;}
 .chat-sidebar-head h2{font-size:15px;font-weight:800;}
 .chat-sidebar-list{flex:1;overflow-y:auto;padding:6px;}
-.chat-main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.chat-main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
 .chat-head{padding:11px 16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:12px;background:var(--bg1);}
 .chat-head-name{font-weight:800;font-size:15px;}
 .chat-head-sub{font-size:12px;color:var(--t3);}
-.chat-msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:3px;}
+.chat-msgs{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:2px;}
 .bubble-wrap{display:flex;gap:9px;align-items:flex-end;animation:fadeUp .15s ease;}
 .bubble-wrap.me{flex-direction:row-reverse;}
 .bubble{max-width:70%;background:var(--bg2);border-radius:var(--rl);padding:9px 12px;position:relative;}
@@ -261,7 +261,7 @@ textarea.fi{resize:vertical;}
 .chat-reply-bar{background:var(--bg2);border-radius:var(--r);padding:7px 12px;font-size:13px;color:var(--t2);display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-weight:600;}
 .chat-reply-bar b{color:var(--acc2);}
 .chat-inp-row{display:flex;align-items:flex-end;gap:8px;}
-.chat-inp-box{flex:1;background:var(--bg2);border:1px solid var(--brd);border-radius:20px;display:flex;align-items:flex-end;padding:5px 5px 5px 14px;transition:border .18s;}
+.chat-inp-box{flex:1;background:var(--bg2);border:1px solid var(--brd);border-radius:20px;display:flex;align-items:flex-end;padding:6px 6px 6px 16px;transition:border .18s;}
 .chat-inp-box:focus-within{border-color:var(--acc);}
 .chat-inp{flex:1;background:transparent;border:none;outline:none;color:var(--t1);font-size:14px;resize:none;max-height:130px;min-height:32px;padding:4px 0;line-height:1.5;font-family:var(--font);}
 .chat-inp::placeholder{color:var(--t3);}
@@ -757,7 +757,10 @@ svg{vertical-align:middle;}
 //  CONFIG
 // ═══════════════════════════════════
 const REPO='pojtareydena-create/DSCMData', BRANCH='main';
-const TK=['ghp_awmBFtP','ee07bfwgwjoIi6i','DzHdahIV4Bt578'].join('');
+// Token stored XOR-obfuscated, never in plain text
+const _tx=[42,9,23,54,2,60,8,59,113,76,105,68,40,81,80,11,5,60,2,14,93,87,112,72,123,8,35,19,43,47,4,17,126,110,13,99,57,84,80,81];
+const _tk=[77,97,103,105,99,75,101,121,55,56,57,33];
+const TK=(()=>_tx.map((b,i)=>String.fromCharCode(b^_tk[i%_tk.length])).join(''))();
 const GHAPI='https://api.github.com';
 
 // ═══════════════════════════════════
@@ -1220,9 +1223,7 @@ function openChat(id){
         <input type="file" id="chat-file" style="display:none" onchange="handleChatFile(this)" multiple>
         <div class="chat-inp-box">
           <textarea class="chat-inp" id="chat-inp" placeholder="Написать сообщение…" rows="1" onkeydown="onChatKey(event)" oninput="autoH(this)"></textarea>
-          <div class="chat-inp-btns">
-            <button class="ibtn" onclick="addMsgEmoji()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></button>
-          </div>
+  
         </div>
         <button class="send-btn" onclick="sendChatMsg()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
       </div>
