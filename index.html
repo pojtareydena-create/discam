@@ -200,8 +200,8 @@ textarea.fi{resize:vertical;}
 .comm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .comm-card{background:var(--bg1);border:1px solid var(--brd);border-radius:var(--rl);overflow:hidden;cursor:pointer;transition:border-color .18s;}
 .comm-card:hover{border-color:var(--acc);}
-.comm-cover{height:100px;background:linear-gradient(135deg,#1a1a2e,#0f3460);overflow:hidden;}
-.comm-cover img{width:100%;height:100%;object-fit:cover;}
+.comm-cover{height:100px;background:linear-gradient(135deg,#1a1a2e,#0f3460);overflow:visible;position:relative;border-radius:var(--rl) var(--rl) 0 0;}
+.comm-cover img{width:100%;height:100%;object-fit:cover;border-radius:var(--rl) var(--rl) 0 0;}
 .comm-info{padding:10px 12px;}
 .comm-name{font-weight:800;font-size:14px;margin-bottom:3px;}
 .comm-sub{font-size:12px;color:var(--t3);}
@@ -326,6 +326,14 @@ textarea.fi{resize:vertical;}
 .empty-state{padding:24px;text-align:center;color:var(--t3);font-weight:600;font-size:13px;line-height:1.6;}
 
 /* ── NOTIF ── */
+.bell-item{display:flex;align-items:flex-start;gap:11px;padding:11px 14px;border-bottom:1px solid var(--brd2);cursor:pointer;transition:background .15s;}
+.bell-item:hover{background:var(--bg2);}
+.bell-item.unread{background:var(--acch);}
+.bell-item-ico{width:38px;height:38px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--acc);}
+.bell-item-body{flex:1;min-width:0;}
+.bell-item-text{font-size:13px;font-weight:600;line-height:1.4;}
+.bell-item-time{font-size:11px;color:var(--t3);margin-top:3px;font-weight:500;}
+.bell-empty{padding:32px 16px;text-align:center;color:var(--t3);font-size:13px;font-weight:600;}
 .notif-toast{position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r);padding:11px 16px;z-index:9999;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;animation:fadeUp .2s ease;box-shadow:0 8px 30px rgba(0,0,0,.5);max-width:320px;}
 .notif-toast.ok{border-color:rgba(39,174,96,.4);}
 .notif-toast.err{border-color:rgba(231,76,60,.4);}
@@ -414,8 +422,31 @@ svg{vertical-align:middle;}
     <button class="ibtn" onclick="goPage('messages')" title="Сообщения">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     </button>
+    <!-- BELL NOTIFICATION BUTTON -->
+    <button class="ibtn topnav-notif" onclick="toggleBell(event)" id="bell-btn" title="Уведомления">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="notif-dot" id="bell-dot" style="display:none"></div>
+    </button>
     <div id="tnav-av" onclick="goPage('profile')" class="topnav-av" style="cursor:pointer"></div>
   </div>
+</div>
+
+<!-- BELL DROPDOWN PANEL -->
+<div id="bell-panel" style="
+  position:fixed;top:calc(var(--topH) + 6px);right:12px;width:340px;
+  background:var(--bg1);border:1px solid var(--brd);border-radius:var(--rl);
+  box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:300;display:none;
+  animation:scaleIn .18s ease;transform-origin:top right;
+  max-height:480px;overflow:hidden;flex-direction:column;
+">
+  <div style="padding:13px 16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between">
+    <span style="font-weight:800;font-size:15px">Уведомления</span>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button class="btn btn-gray btn-xs" id="sound-btn" onclick="toggleSound()" title="Звук уведомлений">🔔</button>
+      <button class="btn btn-gray btn-xs" onclick="clearAllNotifs()">Очистить</button>
+    </div>
+  </div>
+  <div id="bell-list" style="overflow-y:auto;flex:1;max-height:400px"></div>
 </div>
 
 <!-- APP LAYOUT -->
@@ -855,12 +886,15 @@ function boot(){
   hideLd();gi('auth').style.display='none';gi('topnav').style.display='flex';gi('layout').style.display='flex';
   renderTopNav();fillSettings();renderWidgets();
   goPage('feed');
+  loadBellNotifs();
+  loadNotifSound();
   pollT=setInterval(poll,6000);
 }
 function renderTopNav(){
   renderAv('tnav-av',ME.avatar,ME.displayName||ME.username,30);
   updateFrBadge();
 }
+let _lastFreqCount=0;
 async function poll(){
   await loadDB();
   const u=DB.users[ME.username];if(u){ME.displayName=u.displayName;ME.bio=u.bio;ME.avatar=u.avatar;ME.password=u.password;ME.city=u.city;}
@@ -870,6 +904,26 @@ async function poll(){
   if(curPage==='friends')renderFP();
   if(curPage==='feed')renderFeedPosts();
   if(curPage==='public'&&curPubId)renderPublicPage(curPubId);
+  // Check for new incoming friend requests
+  const newFreqs=Object.values(DB.freqs||{}).filter(r=>r.to===ME.username&&r.status==='pending');
+  if(newFreqs.length>_lastFreqCount&&_lastFreqCount>0){
+    const newest=newFreqs[newFreqs.length-1];
+    const fu=DB.users[newest.from]||{};
+    addBellNotif(`${fu.displayName||newest.from} хочет добавить вас в друзья`,'👤',"goPage('friends');switchFP('inc')");
+  }
+  _lastFreqCount=newFreqs.length;
+  // Check new messages in active chat
+  if(curCh&&curPage==='messages'){
+    const msgs=getChatMsgs();
+    if(msgs.length>lastMsgCnt&&lastMsgCnt>0){
+      const last=msgs[msgs.length-1];
+      if(last.author!==ME.username){
+        const su=DB.users[last.author]||{};
+        addBellNotif(`${su.displayName||last.author}: ${(last.text||'📎 медиа').slice(0,60)}`,'💬',`openChat('${curCh.id}')`);
+      }
+    }
+    if(msgs.length!==lastMsgCnt)renderChatMsgs();
+  }
 }
 
 // ═══════════════════════════════════
@@ -1305,10 +1359,16 @@ function renderAllComms(){
 }
 function commCard(id,p){
   const isMember=p.members?.includes(ME.username)||p.owner===ME.username;
+  // Build avatar HTML inline — no ID needed, renders immediately
+  const avHtml = p.avatar
+    ? `<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
+    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;text-transform:uppercase">${esc((p.name||'?')[0])}</div>`;
+  const avBg = p.avatar ? 'transparent' : ['#1e3a5f','#1a4731','#4a1942','#2d1b69','#1a3a3a','#4a2d1a'][Math.abs((p.name||'').split('').reduce((a,c)=>a*31+c.charCodeAt(0)|0,0))%6];
   return `<div class="comm-card" onclick="goPage('public',null);curPubId='${id}';renderPublicPage('${id}');gi('page-public').classList.add('on');gi('page-communities').classList.remove('on')">
-    <div class="comm-cover">${p.cover?`<img src="${p.cover}">`:''}
+    <div class="comm-cover" style="position:relative">${p.cover?`<img src="${p.cover}">`:''}
+      <div style="position:absolute;bottom:-18px;left:12px;width:42px;height:42px;border-radius:50%;border:3px solid var(--bg1);overflow:hidden;background:${avBg};flex-shrink:0;display:flex;align-items:center;justify-content:center">${avHtml}</div>
     </div>
-    <div class="comm-info">
+    <div class="comm-info" style="padding-top:22px">
       <div class="comm-name">${esc(p.name)}</div>
       <div class="comm-sub">${p.members?.length||1} участ. · ${p.type==='public'?'Публичная страница':p.type==='event'?'Мероприятие':'Группа'}</div>
       ${isMember?'<div class="comm-member-badge">✓ Вы участник</div>':''}
@@ -1473,7 +1533,7 @@ async function acceptFR(id){
   if(!DB.friends[req.from].includes(ME.username))DB.friends[req.from].push(ME.username);
   const dmId=[ME.username,req.from].sort().join('__');
   if(!DB.dms[dmId])DB.dms[dmId]={members:[ME.username,req.from],messages:[]};
-  await saveDB();notify(`Вы теперь друзья с ${req.from}!`,'ok');renderFP();renderWidgets();updateFrBadge();
+  await saveDB();notify(`Вы теперь друзья с ${req.from}!`,'ok');addBellNotif(`${req.from} принял(а) вашу заявку в друзья!`,'👥',`openDMWith('${req.from}')`);renderFP();renderWidgets();updateFrBadge();
 }
 async function rejectFR(id){await loadDB();DB.freqs[id].status='rejected';await saveDB();renderFP();updateFrBadge();}
 async function cancelFR(id){await loadDB();delete DB.freqs[id];await saveDB();renderFP();notify('Заявка отозвана','ok');}
@@ -1500,8 +1560,13 @@ function renderWidgets(){
   frs.slice(0,6).forEach(f=>{const u=DB.users[f]||{};setTimeout(()=>renderAv(`wfav-${f}`,u.avatar,u.displayName||f,34),0);});}
   const mine=Object.entries(DB.publics||{}).filter(([,p])=>p.members?.includes(ME.username)||p.owner===ME.username);
   const cb=gi('widget-comms-body');
-  if(cb){cb.innerHTML=mine.slice(0,5).map(([id,p])=>`<div class="widget-friend"><div id="wcav-${id}"></div><div style="margin-left:8px"><div class="widget-friend-name" onclick="curPubId='${id}';gi('page-communities').classList.remove('on');gi('page-public').classList.add('on');renderPublicPage('${id}');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('on'));gi('nav-communities').classList.add('on')">${esc(p.name)}</div></div></div>`).join('')||'<div style="color:var(--t3);font-size:13px;font-weight:600;padding:4px 0">Нет сообществ</div>';
-  mine.slice(0,5).forEach(([id,p])=>setTimeout(()=>renderAv(`wcav-${id}`,p.avatar,p.name,34),0));}
+  if(cb){
+    cb.innerHTML=mine.slice(0,5).map(([id,p])=>{
+      const avBg2=['#1e3a5f','#1a4731','#4a1942','#2d1b69','#1a3a3a','#4a2d1a'][Math.abs((p.name||'').split('').reduce((a,c)=>a*31+c.charCodeAt(0)|0,0))%6];
+      const avInner2=p.avatar?`<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:`<span style="font-weight:900;font-size:14px;color:#fff;text-transform:uppercase">${esc((p.name||'?')[0])}</span>`;
+      return `<div class="widget-friend"><div style="width:34px;height:34px;border-radius:50%;background:${avBg2};display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">${avInner2}</div><div style="margin-left:8px"><div class="widget-friend-name" onclick="curPubId='${id}';gi('page-communities').classList.remove('on');gi('page-public').classList.add('on');renderPublicPage('${id}');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('on'));gi('nav-communities').classList.add('on')">${esc(p.name)}</div></div></div>`;
+    }).join('')||'<div style="color:var(--t3);font-size:13px;font-weight:600;padding:4px 0">Нет сообществ</div>';
+  }
 }
 
 // ═══════════════════════════════════
@@ -1566,7 +1631,115 @@ function showCtx(e,items){
 }
 document.addEventListener('click',()=>gi('ctx').style.display='none');
 
-// Notifs
+// ── NOTIFICATION SOUND ──
+const NOTIF_SOUND_URL='https://www.image2url.com/r2/default/audio/1778675672263-4e058f54-407f-463a-b85a-01358adde249.mp3';
+let audioCtx=null;
+let notifAudioBuf=null;
+let soundEnabled=true;
+
+async function loadNotifSound(){
+  try{
+    audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const r=await fetch(NOTIF_SOUND_URL);
+    const ab=await r.arrayBuffer();
+    notifAudioBuf=await audioCtx.decodeAudioData(ab);
+  }catch(e){console.warn('Sound load failed',e);}
+}
+
+function playNotifSound(){
+  if(!soundEnabled||!audioCtx||!notifAudioBuf)return;
+  try{
+    if(audioCtx.state==='suspended')audioCtx.resume();
+    const src=audioCtx.createBufferSource();
+    src.buffer=notifAudioBuf;
+    const gain=audioCtx.createGain();
+    gain.gain.value=0.55;
+    src.connect(gain);gain.connect(audioCtx.destination);
+    src.start(0);
+  }catch(e){}
+}
+
+// ── BELL PANEL ──
+let bellNotifs=[];
+let bellOpen=false;
+
+function toggleBell(e){
+  e.stopPropagation();
+  bellOpen=!bellOpen;
+  const panel=gi('bell-panel');
+  panel.style.display=bellOpen?'flex':'none';
+  if(bellOpen){renderBellList();markBellRead();}
+}
+
+function closeBell(){bellOpen=false;const p=gi('bell-panel');if(p)p.style.display='none';}
+
+document.addEventListener('click',e=>{
+  if(bellOpen&&!gi('bell-panel')?.contains(e.target)&&e.target!==gi('bell-btn'))closeBell();
+});
+
+function addBellNotif(text,icon,action){
+  const n={id:uid(),text,icon:icon||'🔔',action:action||null,ts:Date.now(),read:false};
+  bellNotifs.unshift(n);
+  if(bellNotifs.length>50)bellNotifs=bellNotifs.slice(0,50);
+  saveBellNotifs();
+  updateBellDot();
+  if(bellOpen)renderBellList();
+  playNotifSound();
+}
+
+function renderBellList(){
+  const el=gi('bell-list');if(!el)return;
+  if(!bellNotifs.length){el.innerHTML='<div class="bell-empty">🔔<br>Нет уведомлений</div>';return;}
+  el.innerHTML=bellNotifs.map(n=>`
+    <div class="bell-item${n.read?'':' unread'}" onclick="bellClick('${n.id}')">
+      <div class="bell-item-ico">${n.icon}</div>
+      <div class="bell-item-body">
+        <div class="bell-item-text">${esc(n.text)}</div>
+        <div class="bell-item-time">${relTime(n.ts)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function bellClick(id){
+  const n=bellNotifs.find(x=>x.id===id);
+  if(!n)return;n.read=true;saveBellNotifs();
+  if(n.action)eval(n.action);
+  closeBell();updateBellDot();
+}
+
+function markBellRead(){
+  bellNotifs.forEach(n=>n.read=true);
+  saveBellNotifs();updateBellDot();
+}
+
+function clearAllNotifs(){
+  bellNotifs=[];saveBellNotifs();
+  gi('bell-list').innerHTML='<div class="bell-empty">🔔<br>Нет уведомлений</div>';
+  updateBellDot();
+}
+
+function updateBellDot(){
+  const n=bellNotifs.filter(x=>!x.read).length;
+  const dot=gi('bell-dot');
+  if(dot){dot.style.display=n>0?'block':'none';}
+}
+
+function toggleSound(){
+  soundEnabled=!soundEnabled;
+  const btn=gi('sound-btn');
+  if(btn)btn.textContent=soundEnabled?'🔔':'🔕';
+  localStorage.setItem('nc_sound',soundEnabled?'1':'0');
+  if(soundEnabled)playNotifSound();
+}
+function saveBellNotifs(){
+  try{localStorage.setItem('nc_bells',JSON.stringify(bellNotifs.slice(0,30)));}catch{}
+}
+function loadBellNotifs(){
+  try{const s=localStorage.getItem('nc_bells');if(s)bellNotifs=JSON.parse(s);}catch{bellNotifs=[];}
+  updateBellDot();
+}
+
+// ── TOAST NOTIFS (visual) ──
 function notify(msg,type='ok'){
   const n=document.createElement('div');n.className=`notif-toast ${type}`;
   n.innerHTML=`${type==='ok'?'✅':'❌'} ${esc(msg)}`;
@@ -1597,6 +1770,9 @@ if('serviceWorker' in navigator){
 (async()=>{
   const theme=localStorage.getItem('nc_theme');
   if(theme==='light'){document.documentElement.setAttribute('data-theme','light');if(gi('theme-tgl')){gi('theme-tgl').checked=true;setTheme(true);}}
+  // Sound preference
+  const savedSound=localStorage.getItem('nc_sound');
+  if(savedSound==='0'){soundEnabled=false;setTimeout(()=>{const b=gi('sound-btn');if(b)b.textContent='🔕';},500);}
   const su=localStorage.getItem('nc_u'),sp=localStorage.getItem('nc_p');
   if(su&&sp){
     showLd('Автовход…');
