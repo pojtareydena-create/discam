@@ -42,6 +42,33 @@ a:hover{text-decoration:underline;}
 img{max-width:100%;}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes iconPop{0%{transform:scale(1)}40%{transform:scale(1.3)}70%{transform:scale(.9)}100%{transform:scale(1)}}
+@keyframes iconWiggle{0%,100%{transform:rotate(0)}20%{transform:rotate(-12deg)}40%{transform:rotate(10deg)}60%{transform:rotate(-6deg)}80%{transform:rotate(4deg)}}
+@keyframes iconBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+@keyframes iconDraw{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
+@keyframes iconSpin1{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes iconBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes iconFade{0%,100%{opacity:1}50%{opacity:.4}}
+/* Animated SVG icon base */
+.ico-anim{display:inline-flex;align-items:center;justify-content:center;transition:transform .2s cubic-bezier(.4,0,.2,1),color .2s;}
+.ico-anim svg{transition:transform .25s cubic-bezier(.4,0,.2,1),stroke .2s;}
+.ico-anim:hover svg,.nav-item:hover .ico-anim svg,.ibtn:hover .ico-anim svg{animation:iconPop .35s ease;}
+.ico-bell:hover svg{animation:iconWiggle .5s ease!important;}
+.ico-heart:hover svg{animation:iconBeat .4s ease!important;}
+.ico-send:hover svg{animation:iconBounce .4s ease!important;}
+.ico-gear:hover svg{animation:iconSpin1 .6s linear!important;}
+.ico-people:hover svg{animation:iconPop .35s ease!important;}
+.ico-msg:hover svg{animation:iconBounce .35s ease!important;}
+.ico-home:hover svg{animation:iconPop .35s ease!important;}
+.ico-search:hover svg{animation:iconPop .3s ease!important;}
+.ico-plus:hover svg{animation:iconSpin1 .3s ease!important;}
+.ico-trash:hover svg{animation:iconWiggle .4s ease!important;}
+.ico-edit:hover svg{animation:iconPop .3s ease!important;}
+.ico-ok svg path{stroke-dasharray:30;stroke-dashoffset:30;animation:iconDraw .35s ease forwards;}
+/* Nav item icon animation */
+.nav-item .nav-ico{transition:transform .2s;}
+.nav-item:hover .nav-ico{animation:iconPop .3s ease;}
+.nav-item.on .nav-ico{animation:iconBeat .4s ease;}
 @keyframes scaleIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
@@ -168,6 +195,10 @@ textarea.fi{resize:vertical;}
 .post-act-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;color:var(--t3);transition:all .15s;border:none;background:transparent;}
 .post-act-btn:hover{background:var(--bg3);color:var(--t1);}
 .post-act-btn.liked{color:var(--danger);}
+.post-act-btn:active svg{animation:iconBeat .3s ease;}
+.post-act-btn:hover svg{animation:iconPop .25s ease;}
+.btn:active svg{animation:iconPop .2s ease;}
+.ibtn:active svg{animation:iconPop .2s ease;}
 .post-act-spacer{flex:1;}
 .post-menu-btn{color:var(--t3);cursor:pointer;display:flex;align-items:center;padding:4px;}
 .post-menu-btn:hover{color:var(--t1);}
@@ -415,15 +446,15 @@ svg{vertical-align:middle;}
   </div>
   <div class="topnav-spacer"></div>
   <div class="topnav-actions">
-    <button class="ibtn topnav-notif" onclick="goPage('friends')" id="tnav-fr-btn" title="Заявки в друзья">
+    <button class="ibtn topnav-notif ico-anim ico-people" onclick="goPage('friends')" id="tnav-fr-btn" title="Заявки в друзья">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <div class="notif-dot" id="fr-dot" style="display:none"></div>
     </button>
-    <button class="ibtn" onclick="goPage('messages')" title="Сообщения">
+    <button class="ibtn ico-anim ico-msg" onclick="goPage('messages')" title="Сообщения">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     </button>
     <!-- BELL NOTIFICATION BUTTON -->
-    <button class="ibtn topnav-notif" onclick="toggleBell(event)" id="bell-btn" title="Уведомления">
+    <button class="ibtn topnav-notif ico-anim ico-bell" onclick="toggleBell(event)" id="bell-btn" title="Уведомления">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <div class="notif-dot" id="bell-dot" style="display:none"></div>
     </button>
@@ -442,7 +473,7 @@ svg{vertical-align:middle;}
   <div style="padding:13px 16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between">
     <span style="font-weight:800;font-size:15px">Уведомления</span>
     <div style="display:flex;gap:6px;align-items:center">
-      <button class="btn btn-gray btn-xs" id="sound-btn" onclick="toggleSound()" title="Звук уведомлений">🔔</button>
+      <button class="btn btn-gray btn-xs ico-anim ico-bell" id="sound-btn" onclick="toggleSound()" title="Звук уведомлений"><svg id="sound-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
       <button class="btn btn-gray btn-xs" onclick="clearAllNotifs()">Очистить</button>
     </div>
   </div>
@@ -454,33 +485,33 @@ svg{vertical-align:middle;}
   <!-- LEFT NAV -->
   <div id="leftnav">
     <div class="nav-item on" id="nav-feed" onclick="goPage('feed')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        <svg class="nav-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
       Новости
     </div>
     <div class="nav-item" id="nav-profile" onclick="goPage('profile')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <svg class="nav-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Моя страница
     </div>
     <div class="nav-item" id="nav-messages" onclick="goPage('messages')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <svg class="nav-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       Сообщения
     </div>
     <div class="nav-item" id="nav-friends" onclick="goPage('friends')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <svg class="nav-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Друзья
       <span class="nav-badge" id="nav-fr-badge" style="display:none"></span>
     </div>
     <div class="nav-item" id="nav-communities" onclick="goPage('communities')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <svg class="nav-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Сообщества
     </div>
     <div class="nav-sep"></div>
     <div class="nav-item" id="nav-settings" onclick="goPage('settings')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <svg class="nav-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       Настройки
     </div>
     <div class="nav-item" style="color:var(--danger)" onclick="doLogout()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <svg class="nav-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       Выйти
     </div>
   </div>
@@ -909,7 +940,7 @@ async function poll(){
   if(newFreqs.length>_lastFreqCount&&_lastFreqCount>0){
     const newest=newFreqs[newFreqs.length-1];
     const fu=DB.users[newest.from]||{};
-    addBellNotif(`${fu.displayName||newest.from} хочет добавить вас в друзья`,'👤',"goPage('friends');switchFP('inc')");
+    addBellNotif(`${fu.displayName||newest.from} хочет добавить вас в друзья`,'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',"goPage('friends');switchFP('inc')");
   }
   _lastFreqCount=newFreqs.length;
   // Check new messages in active chat
@@ -919,7 +950,7 @@ async function poll(){
       const last=msgs[msgs.length-1];
       if(last.author!==ME.username){
         const su=DB.users[last.author]||{};
-        addBellNotif(`${su.displayName||last.author}: ${(last.text||'📎 медиа').slice(0,60)}`,'💬',`openChat('${curCh.id}')`);
+        addBellNotif(`${su.displayName||last.author}: ${(last.text||'📎 медиа').slice(0,60)}`,'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',`openChat('${curCh.id}')`);
       }
     }
     if(msgs.length!==lastMsgCnt)renderChatMsgs();
@@ -1279,7 +1310,7 @@ function openChat(id){
           <textarea class="chat-inp" id="chat-inp" placeholder="Написать сообщение…" rows="1" onkeydown="onChatKey(event)" oninput="autoH(this)"></textarea>
   
         </div>
-        <button class="send-btn" onclick="sendChatMsg()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+        <button class="send-btn ico-anim ico-send" onclick="sendChatMsg()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
       </div>
     </div>`;
   renderAv('chat-head-av',u.avatar,u.displayName||other,40);
@@ -1306,7 +1337,7 @@ function buildBubble(msg){
   if(msg.replyTo){const orig=getChatMsgs().find(m=>m.id===msg.replyTo);if(orig){const ru=DB.users[orig.author]||{};bub.innerHTML+=`<div class="bubble-reply"><b>${esc(ru.displayName||orig.author)}</b>: ${esc((orig.text||'').slice(0,50))}</div>`;}}
   if(msg.text) bub.innerHTML+=`<div class="bubble-txt">${fmtTxt(msg.text)}</div>`;
   if(msg.imageData) bub.innerHTML+=`<img src="${msg.imageData}" class="bubble-img" onclick="showLB('${msg.imageData}')">`;
-  if(msg.fileData) bub.innerHTML+=`<a href="${msg.fileData}" download="${esc(msg.fileName||'file')}" style="color:${isMe?'#fff':'var(--acc2)'};font-size:12px;font-weight:600">📄 ${esc(msg.fileName||'Файл')}</a>`;
+  if(msg.fileData) bub.innerHTML+=`<a href="${msg.fileData}" download="${esc(msg.fileName||'file')}" style="display:inline-flex;align-items:center;gap:6px;color:${isMe?'#fff':'var(--acc2)'};font-size:12px;font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>${esc(msg.fileName||'Файл')}</a>`;
   bub.innerHTML+=`<div class="bubble-time">${relTime(msg.ts)}${msg.edited?' · изм.':''}</div>`;
   const acts=document.createElement('div');acts.className='bubble-acts';
   acts.innerHTML=`<button class="bact" onclick="setChatReply('${msg.id}')" title="Ответить"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg></button>`;
@@ -1401,7 +1432,7 @@ function renderPublicPage(id){
     </div>
     <div class="public-info-bar">
       <div class="public-av-row">
-        <div id="pub-av-big" style="border:3px solid var(--bg1);border-radius:50%;${isOwner?'cursor:pointer':''}"></div>
+        <div id="pub-av-big" style="border:3px solid var(--bg1);border-radius:50%;overflow:hidden;${isOwner?'cursor:pointer':''}"></div>
       </div>
       <div class="public-name">${esc(p.name)}</div>
       <div class="public-desc">${esc(p.description||'')}</div>
@@ -1533,7 +1564,7 @@ async function acceptFR(id){
   if(!DB.friends[req.from].includes(ME.username))DB.friends[req.from].push(ME.username);
   const dmId=[ME.username,req.from].sort().join('__');
   if(!DB.dms[dmId])DB.dms[dmId]={members:[ME.username,req.from],messages:[]};
-  await saveDB();notify(`Вы теперь друзья с ${req.from}!`,'ok');addBellNotif(`${req.from} принял(а) вашу заявку в друзья!`,'👥',`openDMWith('${req.from}')`);renderFP();renderWidgets();updateFrBadge();
+  await saveDB();notify(`Вы теперь друзья с ${req.from}!`,'ok');addBellNotif(`${req.from} принял(а) вашу заявку в друзья!`,'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',`openDMWith('${req.from}')`);renderFP();renderWidgets();updateFrBadge();
 }
 async function rejectFR(id){await loadDB();DB.freqs[id].status='rejected';await saveDB();renderFP();updateFrBadge();}
 async function cancelFR(id){await loadDB();delete DB.freqs[id];await saveDB();renderFP();notify('Заявка отозвана','ok');}
@@ -1608,12 +1639,14 @@ function showLB(src){gi('lb-img').src=src;gi('lb').style.display='flex';}
 
 function renderAv(elId,src,name,size){
   const el=gi(elId);if(!el)return;
-  let h=0;for(let i=0;i<(name||'').length;i++)h=(h*31+(name||'').charCodeAt(i))&0xffffffff;
+  let hh=0;for(let i=0;i<(name||'').length;i++)hh=(hh*31+(name||'').charCodeAt(i))&0xffffffff;
   const bgs=['#1e3a5f','#1a4731','#4a1942','#2d1b69','#1a3a3a','#4a2d1a'];
-  const bg=bgs[Math.abs(h)%bgs.length];const letter=(name||'?')[0].toUpperCase();
-  el.innerHTML=src
-    ?`<div class="av" style="width:${size}px;height:${size}px"><img src="${src}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`
-    :`<div class="av" style="width:${size}px;height:${size}px;background:${bg};font-size:${Math.floor(size*.38)}px;color:#fff">${letter}</div>`;
+  const bg=bgs[Math.abs(hh)%bgs.length];const letter=(name||'?')[0].toUpperCase();
+  if(src){
+    el.innerHTML=`<div class="av" style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${src}" style="width:100%;height:100%;object-fit:cover;display:block"></div>`;
+  }else{
+    el.innerHTML=`<div class="av" style="width:${size}px;height:${size}px;background:${bg};font-size:${Math.floor(size*.38)}px;color:#fff;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800">${letter}</div>`;
+  }
 }
 
 // Modals
@@ -1678,7 +1711,7 @@ document.addEventListener('click',e=>{
 });
 
 function addBellNotif(text,icon,action){
-  const n={id:uid(),text,icon:icon||'🔔',action:action||null,ts:Date.now(),read:false};
+  const n={id:uid(),text,icon:icon||'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',action:action||null,ts:Date.now(),read:false};
   bellNotifs.unshift(n);
   if(bellNotifs.length>50)bellNotifs=bellNotifs.slice(0,50);
   saveBellNotifs();
@@ -1689,7 +1722,7 @@ function addBellNotif(text,icon,action){
 
 function renderBellList(){
   const el=gi('bell-list');if(!el)return;
-  if(!bellNotifs.length){el.innerHTML='<div class="bell-empty">🔔<br>Нет уведомлений</div>';return;}
+  if(!bellNotifs.length){el.innerHTML='<div class="bell-empty"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><br>Нет уведомлений</div>';return;}
   el.innerHTML=bellNotifs.map(n=>`
     <div class="bell-item${n.read?'':' unread'}" onclick="bellClick('${n.id}')">
       <div class="bell-item-ico">${n.icon}</div>
@@ -1714,7 +1747,7 @@ function markBellRead(){
 
 function clearAllNotifs(){
   bellNotifs=[];saveBellNotifs();
-  gi('bell-list').innerHTML='<div class="bell-empty">🔔<br>Нет уведомлений</div>';
+  gi('bell-list').innerHTML='<div class="bell-empty"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><br>Нет уведомлений</div>';
   updateBellDot();
 }
 
@@ -1726,8 +1759,17 @@ function updateBellDot(){
 
 function toggleSound(){
   soundEnabled=!soundEnabled;
-  const btn=gi('sound-btn');
-  if(btn)btn.textContent=soundEnabled?'🔔':'🔕';
+  const ico=gi('sound-icon');
+  if(ico){
+    if(soundEnabled){
+      // Bell on
+      ico.innerHTML=`<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>`;
+      ico.style.stroke='currentColor';
+    }else{
+      // Bell off (with X slash)
+      ico.innerHTML=`<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><line x1="2" y1="2" x2="22" y2="22" stroke="var(--danger)"/>`;
+    }
+  }
   localStorage.setItem('nc_sound',soundEnabled?'1':'0');
   if(soundEnabled)playNotifSound();
 }
@@ -1742,12 +1784,15 @@ function loadBellNotifs(){
 // ── TOAST NOTIFS (visual) ──
 function notify(msg,type='ok'){
   const n=document.createElement('div');n.className=`notif-toast ${type}`;
-  n.innerHTML=`${type==='ok'?'✅':'❌'} ${esc(msg)}`;
+  n.innerHTML=`${type==='ok'
+      ?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" class="ico-anim ico-ok"><polyline points="20 6 9 17 4 12"/></svg>'
+      :'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+    } ${esc(msg)}`;
   document.body.appendChild(n);setTimeout(()=>n.remove(),3200);
 }
 
 // Loading
-function showLd(msg){gi('loading').style.display='flex';gi('ld-txt').textContent=msg||'';}
+function showLd(msg){/* silent during normal ops - only initial boot shows loader */}
 function hideLd(){gi('loading').style.display='none';}
 
 // Light theme (VK-style blue)
@@ -1772,7 +1817,7 @@ if('serviceWorker' in navigator){
   if(theme==='light'){document.documentElement.setAttribute('data-theme','light');if(gi('theme-tgl')){gi('theme-tgl').checked=true;setTheme(true);}}
   // Sound preference
   const savedSound=localStorage.getItem('nc_sound');
-  if(savedSound==='0'){soundEnabled=false;setTimeout(()=>{const b=gi('sound-btn');if(b)b.textContent='🔕';},500);}
+  if(savedSound==='0'){soundEnabled=false;setTimeout(()=>{const ico=gi('sound-icon');if(ico)ico.innerHTML=`<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><line x1="2" y1="2" x2="22" y2="22" stroke="var(--danger)"/>`;},500);}
   const su=localStorage.getItem('nc_u'),sp=localStorage.getItem('nc_p');
   if(su&&sp){
     showLd('Автовход…');
